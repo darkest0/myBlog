@@ -268,8 +268,8 @@ public class MyBlogController {
     /**
      * 关于页面 以及其他配置了subUrl的文章页
      */
-    @GetMapping
-    public String detail(HttpServletRequest request, String subUrl){
+    @GetMapping({"/{subUrl}"})
+    public String detail(HttpServletRequest request, @PathVariable String subUrl){
         BlogDetailVO blogDetailVO = blogService.getBlogDetailByStrUrl(subUrl);
         if (blogDetailVO!=null){
             request.setAttribute("blogDetailVO",blogDetailVO);

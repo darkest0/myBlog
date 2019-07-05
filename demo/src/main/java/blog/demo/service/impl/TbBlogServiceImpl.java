@@ -196,12 +196,8 @@ public class TbBlogServiceImpl extends ServiceImpl<TbBlogMapper, TbBlog> impleme
     public BlogDetailVO getBlogDetailByStrUrl(String subUrl) {
         QueryWrapper<TbBlog> queryWrapper =new QueryWrapper<>();
         queryWrapper.eq("blog_sub_url",subUrl).eq("is_deleted",0);
-        List<TbBlog> tbBlogs = tbBlogMapper.selectList(queryWrapper);
-        if (tbBlogs==null && !tbBlogs.isEmpty()){
-            System.out.println("出现了问题OvO！");
-            return null;
-        }
-        BlogDetailVO blogDetailVO = getBlogDetailVO(tbBlogs.get(0));
+        TbBlog tbBlog = tbBlogMapper.selectOne(queryWrapper);
+        BlogDetailVO blogDetailVO = getBlogDetailVO(tbBlog);
         if (blogDetailVO!=null){
             return blogDetailVO;
         }
