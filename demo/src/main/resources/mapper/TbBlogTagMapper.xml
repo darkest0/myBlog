@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="blog.demo.dao.TbBlogTagMapper">
+
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="blog.demo.entity.TbBlogTag">
+        <id column="tag_id" property="tagId" />
+        <result column="tag_name" property="tagName" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        tag_id, tag_name, is_deleted, create_time
+    </sql>
+
+    <select id="getTagCount" resultType="blog.demo.entity.TbBlogTagCount">
+       SELECT t_r.*,t.tag_name FROM
+        (SELECT r.tag_id,r.tag_count FROM
+         (SELECT tag_id ,COUNT(*) AS tag_count FROM
+	      (SELECT tr.tag_id FROM tb_blog_tag_relation tr LEFT JOIN tb_blog b ON tr.blog_id = b.blog_id WHERE b.is_deleted=0)
+	        trb GROUP BY tag_id) r ORDER BY tag_count DESC LIMIT 20 ) AS t_r LEFT JOIN tb_blog_tag t ON t_r.tag_id = t.tag_id WHERE t.is_deleted=0
+    </select>
+
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="blog.demo.dao.TbBlogCommentMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="blog.demo.entity.TbBlogComment">
+        <id column="comment_id" property="commentId" />
+        <result column="blog_id" property="blogId" />
+        <result column="commentator" property="commentator" />
+        <result column="email" property="email" />
+        <result column="website_url" property="websiteUrl" />
+        <result column="comment_body" property="commentBody" />
+        <result column="comment_create_time" property="commentCreateTime" />
+        <result column="commentator_ip" property="commentatorIp" />
+        <result column="reply_body" property="replyBody" />
+        <result column="reply_create_time" property="replyCreateTime" />
+        <result column="comment_status" property="commentStatus" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        comment_id, blog_id, commentator, email, website_url, comment_body, comment_create_time, commentator_ip, reply_body, reply_create_time, comment_status, is_deleted
+    </sql>
+    <select id="getTotalBlogCommentDiy" resultType="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_blog_comment
+        where is_deleted=0
+        <if test="blogId!=null">
+            AND blog_id = #{blogId}
+        </if>
+        <if test="commentStatus!=null">
+            AND comment_status = #{commentStatus}
+        </if>
+        order by comment_id desc
+        <if test="start!=null and limit!=null">
+            limit #{start},#{limit}
+        </if>
+    </select>
+
+</mapper>
