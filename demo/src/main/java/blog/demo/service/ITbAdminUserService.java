@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2019-07-03
  */
 public interface ITbAdminUserService extends IService<TbAdminUser> {
-
+    TbAdminUser login(String userName,String passWord);
 }
