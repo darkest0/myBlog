@@ -23,4 +23,9 @@ public interface ITbLinkService extends IService<TbLink> {
      */
     Map<Integer,List<TbLink>> getLink();
 
+    /**
+     * 获取友链数量
+     */
+    int getTotalLink();
+
 }

@@ -54,4 +54,9 @@ public interface ITbBlogService extends IService<TbBlog> {
      * 根据 subUrl获取 文章详情
      */
     BlogDetailVO getBlogDetailByStrUrl(String subUrl);
+
+    /**
+     * 获取文章数量
+     */
+    int getTotalBlog();
 }

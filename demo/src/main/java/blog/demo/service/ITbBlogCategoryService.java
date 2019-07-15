@@ -20,4 +20,8 @@ public interface ITbBlogCategoryService extends IService<TbBlogCategory> {
      */
     List<TbBlogCategory> getAllCategory();
 
+    /**
+     * 获取 分类的数量
+     */
+    int getTotalCategory();
 }

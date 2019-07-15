@@ -35,4 +35,12 @@ public class TbBlogCategoryServiceImpl extends ServiceImpl<TbBlogCategoryMapper,
         List<TbBlogCategory> categoryList=categoryMapper.selectList(queryWrapper);
         return categoryList;
     }
+
+    @Override
+    public int getTotalCategory() {
+        QueryWrapper<TbBlogCategory> queryWrapper =new QueryWrapper<>();
+        queryWrapper.eq("is_deleted",0);
+        int total = categoryMapper.selectCount(queryWrapper);
+        return total;
+    }
 }

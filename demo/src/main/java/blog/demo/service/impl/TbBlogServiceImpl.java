@@ -204,6 +204,14 @@ public class TbBlogServiceImpl extends ServiceImpl<TbBlogMapper, TbBlog> impleme
         return null;
     }
 
+    @Override
+    public int getTotalBlog() {
+        QueryWrapper<TbBlog> queryWrapper =new QueryWrapper<>();
+        queryWrapper.eq("is_deleted",0);
+        int total = tbBlogMapper.selectCount(queryWrapper);
+        return total;
+    }
+
     /**
      * 转化为文章
      * @param blog

@@ -11,7 +11,7 @@ public class LoginInput {
     /**
      * 密码
      */
-    private String passWord;
+    private String password;
     /**
      * 验证码
      */

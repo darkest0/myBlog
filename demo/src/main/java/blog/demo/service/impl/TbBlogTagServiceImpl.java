@@ -5,6 +5,7 @@ import blog.demo.dao.TbBlogTagMapper;
 import blog.demo.entity.TbBlogTagCount;
 import blog.demo.entity.TbBlogTagRelation;
 import blog.demo.service.ITbBlogTagService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,4 +30,13 @@ public class TbBlogTagServiceImpl extends ServiceImpl<TbBlogTagMapper, TbBlogTag
     public List<TbBlogTagCount> getBlogTagCountForIndex() {
         return blogTagMapper.getTagCount();
     }
+
+    @Override
+    public int getTotalTag() {
+        QueryWrapper<TbBlogTag> queryWrapper =new QueryWrapper<>();
+        queryWrapper.eq("is_deleted",0);
+        int total = blogTagMapper.selectCount(queryWrapper);
+        return  total;
+    }
+
 }

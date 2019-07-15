@@ -22,4 +22,8 @@ public interface ITbBlogTagService extends IService<TbBlogTag> {
      */
     List<TbBlogTagCount> getBlogTagCountForIndex();
 
+    /**
+     * 获取标签数量
+     */
+    int getTotalTag();
 }

@@ -21,4 +21,8 @@ public interface ITbBlogCommentService extends IService<TbBlogComment> {
      */
     PageResult getCommentPageByBlogIdAndPageNum(Long blogId,int page);
 
+    /**
+     * 获取评论的数量
+     */
+    int getTotalComment();
 }

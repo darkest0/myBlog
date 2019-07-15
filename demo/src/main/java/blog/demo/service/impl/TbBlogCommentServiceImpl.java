@@ -1,7 +1,9 @@
 package blog.demo.service.impl;
 
+import blog.demo.dao.TbLinkMapper;
 import blog.demo.entity.TbBlogComment;
 import blog.demo.dao.TbBlogCommentMapper;
+import blog.demo.entity.TbLink;
 import blog.demo.service.ITbBlogCommentService;
 import blog.demo.util.PageQueryUtil;
 import blog.demo.util.PageResult;
@@ -52,5 +54,13 @@ public class TbBlogCommentServiceImpl extends ServiceImpl<TbBlogCommentMapper, T
             return pageResult;
         }
         return null;
+    }
+
+    @Override
+    public int getTotalComment() {
+        QueryWrapper<TbBlogComment> queryWrapper =new QueryWrapper();
+        queryWrapper.eq("is_deleted",0);
+        int total = blogcommentMapper.selectCount(queryWrapper);
+        return total;
     }
 }

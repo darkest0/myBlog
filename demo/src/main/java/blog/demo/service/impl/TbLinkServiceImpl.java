@@ -47,4 +47,12 @@ public class TbLinkServiceImpl extends ServiceImpl<TbLinkMapper, TbLink> impleme
         }
         return null;
     }
+
+    @Override
+    public int getTotalLink() {
+        QueryWrapper<TbLink> queryWrapper =new QueryWrapper<>();
+        queryWrapper.eq("is_deleted",0);
+        int total = linkMapper.selectCount(queryWrapper);
+        return total;
+    }
 }
