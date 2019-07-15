@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -45,6 +47,9 @@ public class AdminController {
         return "admin/login";
     }
 
+    @GetMapping({"/test"})
+    public String test(){ return "admin/test"; }
+
     @PostMapping("/login")
     public String login( LoginInput input, HttpSession session){
         if (StringUtils.isEmpty(input.getVerifyCode())){
@@ -71,7 +76,7 @@ public class AdminController {
         }
     }
 
-    @GetMapping({"","/","/index","index.html"})
+    @GetMapping({"", "/", "/index", "/index.html"})
     public String index(HttpServletRequest request){
         request.setAttribute("path","index");
         request.setAttribute("categoryCount",categoryService.getTotalCategory());
@@ -94,5 +99,48 @@ public class AdminController {
         request.setAttribute("loginUserName",adminUser.getLoginUserName());
         request.setAttribute("nickName",adminUser.getNickName());
         return "admin/profile";
+    }
+
+    @PostMapping("/profile/password")
+    @ResponseBody
+    public String passwordUpdate(HttpServletRequest request,@RequestParam("originalPassword") String originalPassword,
+                                 @RequestParam("newPassword") String newPassword){
+
+        if (StringUtils.isEmpty(originalPassword)||StringUtils.isEmpty(newPassword)){
+            return "参数不能为空";
+        }
+        Integer loginUserid =(Integer) request.getSession().getAttribute("loginUserId");
+        if (adminUserService.updatePassword(loginUserid,originalPassword,newPassword)){
+            //清空session中的数据，前端控制转跳登陆界面
+            request.getSession().removeAttribute("loginUserId");
+            request.getSession().removeAttribute("loginUser");
+            request.getSession().removeAttribute("errorMsg");
+            return "success";
+        }else {
+            return "修改失败";
+        }
+    }
+    @PostMapping("/profile/name")
+    @ResponseBody
+    public String nameUpdate(HttpServletRequest request, @RequestParam("loginUserName") String loginUserName,
+                             @RequestParam("nickName") String nickName){
+
+        if (StringUtils.isEmpty(loginUserName)||StringUtils.isEmpty(nickName)){
+            return "参数不能为空";
+        }
+        Integer loginUserId = (Integer) request.getSession().getAttribute("loginUserId");
+        if (adminUserService.updateName(loginUserId,loginUserName,nickName)){
+            return "success";
+        }else {
+            return "修改失败";
+        }
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        request.getSession().removeAttribute("loginUserId");
+        request.getSession().removeAttribute("loginUser");
+        request.getSession().removeAttribute("errorMsg");
+        return "admin/login";
     }
 }

@@ -32,4 +32,36 @@ public class TbAdminUserServiceImpl extends ServiceImpl<TbAdminUserMapper, TbAdm
         TbAdminUser adminUser = adminUserMapper.selectOne(queryWrapper);
         return adminUser;
     }
+
+    @Override
+    public Boolean updatePassword(Integer loginUserId, String originalPassword, String newPassword) {
+        TbAdminUser adminUser = adminUserMapper.selectById(loginUserId);
+        //用户不为空 才可进行更改
+        if(adminUser!=null){
+            String originalPasswordMd5 =MD5Util.MD5Encode(originalPassword,"UTF-8");
+            String newPasswordMd5 =MD5Util.MD5Encode(newPassword,"UTF-8");
+            //对比原密码
+            if (originalPasswordMd5.equals(adminUser.getLoginPassword())){
+                adminUser.setLoginPassword(newPasswordMd5);
+                if (adminUserMapper.updateById(adminUser)>0){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean updateName(Integer loginUserId, String loginUserName, String nickName) {
+        TbAdminUser user =adminUserMapper.selectById(loginUserId);
+        //用户存在
+        if (user!=null){
+            user.setLoginUserName(loginUserName);
+            user.setNickName(nickName);
+            if (adminUserMapper.updateById(user)>1){
+                return true;
+            }
+        }
+        return false;
+    }
 }
