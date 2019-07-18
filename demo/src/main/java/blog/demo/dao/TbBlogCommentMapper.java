@@ -19,4 +19,13 @@ import java.util.Map;
 public interface TbBlogCommentMapper extends BaseMapper<TbBlogComment> {
     List<TbBlogComment> getTotalBlogCommentDiy(Map map);
 
+    /**
+     * 获取评论
+     * @param map
+     * @return
+     */
+    List<TbBlogComment> findBlogCommentList(Map map);
+
+    int getTotalComment(Map map);
+
 }

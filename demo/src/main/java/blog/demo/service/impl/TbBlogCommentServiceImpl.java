@@ -1,6 +1,7 @@
 package blog.demo.service.impl;
 
 import blog.demo.dao.TbLinkMapper;
+import blog.demo.entity.TbBlog;
 import blog.demo.entity.TbBlogComment;
 import blog.demo.dao.TbBlogCommentMapper;
 import blog.demo.entity.TbLink;
@@ -11,9 +12,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.sf.jsqlparser.statement.select.Limit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,5 +65,43 @@ public class TbBlogCommentServiceImpl extends ServiceImpl<TbBlogCommentMapper, T
         queryWrapper.eq("is_deleted",0);
         int total = blogcommentMapper.selectCount(queryWrapper);
         return total;
+    }
+
+    @Override
+    public PageResult getCompentPage(PageQueryUtil pageQueryUtil) {
+        List<TbBlogComment> comments = blogcommentMapper.findBlogCommentList(pageQueryUtil);
+        int total =blogcommentMapper.getTotalComment(pageQueryUtil);
+        PageResult pageResult =new PageResult(comments,total,pageQueryUtil.getLimit(),pageQueryUtil.getPage());
+        return pageResult;
+    }
+
+    @Override
+    public Boolean checkDone(Integer[] ids) {
+        TbBlogComment comment =new TbBlogComment();
+        comment.setCommentStatus(1);
+        QueryWrapper<TbBlogComment> queryWrapper =new QueryWrapper<>();
+        queryWrapper.in("comment_id",ids).eq("comment_status",0);
+        return blogcommentMapper.update(comment,queryWrapper)>0;
+    }
+
+    @Override
+    public Boolean reply(Long commentId, String replyBody) {
+        TbBlogComment blogComment = blogcommentMapper.selectById(commentId);
+        //blogComment不为空且状态为已审核，则继续后续操作
+        if (blogComment!=null && blogComment.getCommentStatus().intValue()==1){
+            blogComment.setReplyBody(replyBody);
+            blogComment.setReplyCreateTime(new Date());
+            return blogcommentMapper.updateById(blogComment)>0;
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean deleteBath(Integer[] ids) {
+        TbBlogComment comment =new TbBlogComment();
+        comment.setIsDeleted(1);
+        QueryWrapper<TbBlogComment> queryWrapper =new QueryWrapper();
+        queryWrapper.in("comment_id",ids);
+        return blogcommentMapper.update(comment,queryWrapper)>0;
     }
 }
