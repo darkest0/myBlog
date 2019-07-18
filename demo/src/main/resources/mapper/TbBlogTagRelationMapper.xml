@@ -15,5 +15,12 @@
     <sql id="Base_Column_List">
         relation_id, blog_id, tag_id, create_time
     </sql>
+    <insert id="batchInsert">
+           INSERT into tb_blog_tag_relation(blog_id,tag_id)
+           VALUES
+           <foreach collection="list" item="item" separator=",">
+               (#{item.blogId,jdbcType=BIGINT},#{item.tagId,jdbcType=INTEGER})
+           </foreach>
+    </insert>
 
 </mapper>

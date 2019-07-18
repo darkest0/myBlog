@@ -17,7 +17,6 @@ import blog.demo.util.MarkDownUtil;
 import blog.demo.util.PageQueryUtil;
 import blog.demo.util.PageResult;
 import blog.demo.util.PatternUtil;
-import ch.qos.logback.core.net.SyslogOutputStream;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
@@ -26,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.TypeVariable;
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -210,6 +211,152 @@ public class TbBlogServiceImpl extends ServiceImpl<TbBlogMapper, TbBlog> impleme
         queryWrapper.eq("is_deleted",0);
         int total = tbBlogMapper.selectCount(queryWrapper);
         return total;
+    }
+
+    @Override
+    public PageResult getBlogsPage(PageQueryUtil pageQueryUtil) {
+        List<TbBlog> blogList=tbBlogMapper.selectBloglist(pageQueryUtil);
+        int total = tbBlogMapper.getBlogTotal(pageQueryUtil);
+        PageResult pageResult =new PageResult(blogList,total,pageQueryUtil.getLimit(),pageQueryUtil.getPage());
+        return pageResult;
+    }
+
+    @Override
+    public TbBlog getBlogById(Long bligId) {
+        TbBlog blog = tbBlogMapper.selectById(bligId);
+        return blog;
+    }
+
+    @Override
+    public String saveBlog(TbBlog blog) {
+        TbBlogCategory blogCategory = categoryMapper.selectById(blog.getBlogCategoryId());
+        if (blogCategory ==null){
+            blog.setBlogCategoryId(0);
+            blog.setBlogCategoryName("默认分类");
+        }else {
+            //设置博客分类
+            blog.setBlogCategoryName(blogCategory.getCategoryName());
+            //分类排序+1
+            blogCategory.setCategoryRank(blogCategory.getCategoryRank()+1);
+        }
+        //处理标签数据
+        String[] tags =blog.getBlogTags().split(",");
+        if (tags.length>6){
+            return "标签限制为6";
+        }
+        //保存文章
+        if(tbBlogMapper.insert(blog)>0){
+            // 新增的 tag 对象
+            List<TbBlogTag> tagListForInsert =new ArrayList<>();
+            //所有的 tag 对象，用于建立联系
+            List<TbBlogTag> allTagsList = new ArrayList<>();
+            for (int i=0;i<tags.length ;i++){
+                QueryWrapper<TbBlogTag> queryWrapper =new QueryWrapper<>();
+                queryWrapper.eq("tag_name",tags[i]).eq("is_deleted",0);
+                TbBlogTag tag = blogTagMapper.selectOne(queryWrapper);
+                if (tag ==null){
+                    //不存在 就新增
+                    TbBlogTag tempTag =new TbBlogTag();
+                    tempTag.setTagName(tags[i]);
+                    tagListForInsert.add(tempTag);
+                }else {
+                    allTagsList.add(tag);
+                }
+            }
+            //新增标签数据 并修改分类 排序的值
+            if(!CollectionUtils.isEmpty(tagListForInsert)){
+                blogTagMapper.batchInsertBlogTag(tagListForInsert);
+            }
+            categoryMapper.updateById(blogCategory);
+            List<TbBlogTagRelation>blogTagRelations =new ArrayList<>();
+            // 新增数据关系
+            allTagsList.addAll(tagListForInsert);
+            for (TbBlogTag tag:allTagsList){
+                TbBlogTagRelation blogTagRelation =new TbBlogTagRelation();
+                blogTagRelation.setBlogId(blog.getBlogId());
+                blogTagRelation.setTagId(tag.getTagId());
+                blogTagRelations.add(blogTagRelation);
+            }
+            if (blogTagRelationMapper.batchInsert(blogTagRelations)>0){
+                return "success";
+            }
+
+        }
+        return "保存失败";
+    }
+
+    @Override
+    public String updateBlog(TbBlog blog) {
+        TbBlog blogForUpdate = tbBlogMapper.selectById(blog.getBlogId());
+        if (blogForUpdate == null){
+            return "数据不存在";
+        }
+        //修改数据导入
+        blogForUpdate.setBlogTitle(blog.getBlogTitle());
+        blogForUpdate.setBlogSubUrl(blog.getBlogSubUrl());
+        blogForUpdate.setBlogContent(blog.getBlogContent());
+        blogForUpdate.setBlogCoverImage(blog.getBlogCoverImage());
+        blogForUpdate.setBlogStatus(blog.getBlogStatus());
+        blogForUpdate.setEnableComment(blog.getEnableComment());
+        TbBlogCategory blogCategory = categoryMapper.selectById(blog.getBlogCategoryId());
+        if (blogCategory == null){
+            blogForUpdate.setBlogCategoryId(0);
+            blogForUpdate.setBlogCategoryName("默认分类");
+        }else {
+            blogForUpdate.setBlogCategoryId(blogCategory.getCategoryId());
+            blogForUpdate.setBlogCategoryName(blogCategory.getCategoryName());
+            //分类的排序+1
+            blogCategory.setCategoryRank(blogCategory.getCategoryRank()+1);
+        }
+        String[] tags =blog.getBlogTags().split(",");
+        if (tags.length>6){
+            return "标签数量为6";
+        }
+        blogForUpdate.setBlogTags(blog.getBlogTags());
+        //新增的tag对象
+        List<TbBlogTag> tagListForTags =new ArrayList<>();
+        //所有tag对象建立关系数据
+        List<TbBlogTag> allTagList =new ArrayList<>();
+        for(int i=0 ;i<tags.length;i++){
+            TbBlogTag tag =blogTagMapper.selectById(tags[i]);
+            if (tag == null){
+                //不存在 tag 就新增
+                TbBlogTag tempTag =new TbBlogTag();
+                tempTag.setTagName(tags[i]);
+                tagListForTags.add(tempTag);
+            }else {
+                allTagList.add(tag);
+            }
+        }
+        //新增标签数据不为空的情况，新增标签数据
+        if(!CollectionUtils.isEmpty(tagListForTags)){
+            blogTagMapper.batchInsertBlogTag(tagListForTags);
+        }
+        List<TbBlogTagRelation> tbBlogTagRelations =new ArrayList<>();
+        //新增关系数据
+        allTagList.addAll(tagListForTags);
+        for (TbBlogTag tag : allTagList) {
+            TbBlogTagRelation tbBlogTagRelation =new TbBlogTagRelation();
+            tbBlogTagRelation.setBlogId(blog.getBlogId());
+            tbBlogTagRelation.setTagId(tag.getTagId());
+            tbBlogTagRelations.add(tbBlogTagRelation);
+        }
+        //修改blog信息->修改分类排序值->删除原关系数据->保存新的关系数据
+        categoryMapper.updateById(blogCategory);
+        //删除原关系数据
+        QueryWrapper<TbBlogTagRelation> queryWrapper =new QueryWrapper<>();
+        queryWrapper.eq("blog_id",blog.getBlogId());
+        blogTagRelationMapper.delete(queryWrapper);
+        blogTagRelationMapper.batchInsert(tbBlogTagRelations);
+        if (tbBlogMapper.updateById(blogForUpdate)>0){
+            return "success";
+        }
+        return "修改失败";
+    }
+
+    @Override
+    public Boolean deleteBath(Integer[] ids) {
+        return tbBlogMapper.deleteBatch(ids) >0;
     }
 
     /**

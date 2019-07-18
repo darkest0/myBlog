@@ -3,6 +3,7 @@ package blog.demo.service;
 import blog.demo.controller.vo.BlogDetailVO;
 import blog.demo.controller.vo.BlogListVO;
 import blog.demo.entity.TbBlog;
+import blog.demo.util.PageQueryUtil;
 import blog.demo.util.PageResult;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -59,4 +60,36 @@ public interface ITbBlogService extends IService<TbBlog> {
      * 获取文章数量
      */
     int getTotalBlog();
+    /**
+     * 获取文章
+     */
+    PageResult getBlogsPage(PageQueryUtil pageQueryUtil);
+
+    /**
+     * 获取文章 by blogid
+     * @param bligId
+     * @return
+     */
+    TbBlog getBlogById(Long bligId);
+
+    /**
+     * 保存文章
+     * @param blog
+     * @return
+     */
+    String saveBlog(TbBlog blog);
+
+    /**
+     * 修改文章
+     * @param blog
+     * @return
+     */
+    String updateBlog(TbBlog blog);
+
+    /**
+     * 删除文章
+     * @param ids
+     * @return
+     */
+    Boolean deleteBath(Integer[] ids);
 }

@@ -26,6 +26,13 @@
     <sql id="Base_Column_List">
         blog_id, blog_title, blog_sub_url, blog_cover_image, blog_content, blog_category_id, blog_category_name, blog_tags, blog_status, blog_views, enable_comment, is_deleted, create_time, update_time
     </sql>
+    <update id="deleteBatch">
+        update tb_blog set is_deleted =1
+        where blog_id in
+        <foreach collection="array" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
 
     <select id="selectByDiy" resultType="blog.demo.entity.TbBlog">
         select <include refid="Base_Column_List"/>
@@ -89,5 +96,23 @@
             AND blog_category_id = #{blogCategoryId}
         </if>
     </select>
-
+    <select id="selectBloglist" resultType="blog.demo.entity.TbBlog" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_blog
+        where is_deleted=0
+        <if test="keyword!=null">
+            AND (blog_title like CONCAT('%','${keyword}','%' ) or blog_category_name like CONCAT('%','${keyword}','%' ))
+        </if>
+        <if test="blogStatus!=null">
+            AND blog_status = #{blogStatus}
+        </if>
+        <if test="blogCategoryId!=null">
+            AND blog_category_id = #{blogCategoryId}
+        </if>
+        order by blog_id desc
+        <if test="start!=null and limit!=null">
+            limit #{start},#{limit}
+        </if>
+    </select>
 </mapper>

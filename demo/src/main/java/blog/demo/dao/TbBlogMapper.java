@@ -42,4 +42,13 @@ public interface TbBlogMapper extends BaseMapper<TbBlog> {
      */
     int getBlogTotal(PageQueryUtil map);
 
+    /**
+     * 获取 文章list
+     */
+    List<TbBlog> selectBloglist(PageQueryUtil pageQueryUtil);
+
+    /**
+     * 修改文章
+     */
+    int deleteBatch(Integer[] ids);
 }

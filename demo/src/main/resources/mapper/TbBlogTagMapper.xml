@@ -17,6 +17,14 @@
     <sql id="Base_Column_List">
         tag_id, tag_name, is_deleted, create_time
     </sql>
+    <insert id="batchInsertBlogTag" parameterType="java.util.List" useGeneratedKeys="true"
+            keyProperty="tagId">
+        INSERT into tb_blog_tag(tag_name)
+        value
+        <foreach collection="list" item="item" separator=",">
+            (#{item.tagName,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
 
     <select id="getTagCount" resultType="blog.demo.entity.TbBlogTagCount">
        SELECT t_r.*,t.tag_name FROM

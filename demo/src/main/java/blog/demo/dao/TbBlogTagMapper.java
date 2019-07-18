@@ -22,4 +22,6 @@ public interface TbBlogTagMapper extends BaseMapper<TbBlogTag> {
      */
    List<TbBlogTagCount> getTagCount();
 
+   int batchInsertBlogTag(List<TbBlogTag> tagList);
+
 }
