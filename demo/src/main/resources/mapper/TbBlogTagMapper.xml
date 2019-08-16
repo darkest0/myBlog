@@ -33,5 +33,15 @@
 	      (SELECT tr.tag_id FROM tb_blog_tag_relation tr LEFT JOIN tb_blog b ON tr.blog_id = b.blog_id WHERE b.is_deleted=0)
 	        trb GROUP BY tag_id) r ORDER BY tag_count DESC LIMIT 20 ) AS t_r LEFT JOIN tb_blog_tag t ON t_r.tag_id = t.tag_id WHERE t.is_deleted=0
     </select>
+    <select id="selectTagPage" resultType="blog.demo.entity.TbBlogTag" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_blog_tag
+        where is_deleted=0
+        order by tag_id desc
+        <if test="start!=null and limit!=null">
+            limit #{start},#{limit}
+        </if>
+    </select>
 
 </mapper>

@@ -2,6 +2,7 @@ package blog.demo.service;
 
 import blog.demo.controller.vo.BlogListVO;
 import blog.demo.entity.TbLink;
+import blog.demo.util.PageQueryUtil;
 import blog.demo.util.PageResult;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -27,5 +28,10 @@ public interface ITbLinkService extends IService<TbLink> {
      * 获取友链数量
      */
     int getTotalLink();
+
+    /**
+     * 友链的分页查询
+     */
+    PageResult getBlogLinkPage(PageQueryUtil pageQueryUtil);
 
 }

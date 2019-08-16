@@ -3,6 +3,7 @@ package blog.demo.dao;
 import blog.demo.entity.TbBlogTag;
 import blog.demo.entity.TbBlogTagCount;
 import blog.demo.entity.TbBlogTagRelation;
+import blog.demo.util.PageQueryUtil;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
@@ -23,5 +24,12 @@ public interface TbBlogTagMapper extends BaseMapper<TbBlogTag> {
    List<TbBlogTagCount> getTagCount();
 
    int batchInsertBlogTag(List<TbBlogTag> tagList);
+
+    /**
+     * 标签分页
+     * @param pageQueryUtil
+     * @returnc
+     */
+    List<TbBlogTag> selectTagPage(PageQueryUtil pageQueryUtil);
 
 }

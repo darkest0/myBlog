@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import javax.validation.constraints.Max;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -89,5 +90,16 @@ public class TbConfigServiceImpl extends ServiceImpl<TbConfigMapper, TbConfig> i
             }
         }
         return configMap;
+    }
+
+    @Override
+    public int updateConfig(String configName, String configValue) {
+        TbConfig config =configMapper.selectById(configName);
+        if (config!=null){
+            config.setConfigValue(configValue);
+            config.setUpdateTime(new Date());
+            return configMapper.updateById(config);
+        }
+        return 0;
     }
 }

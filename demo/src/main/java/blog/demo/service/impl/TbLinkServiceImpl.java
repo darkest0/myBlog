@@ -55,4 +55,12 @@ public class TbLinkServiceImpl extends ServiceImpl<TbLinkMapper, TbLink> impleme
         int total = linkMapper.selectCount(queryWrapper);
         return total;
     }
+
+    @Override
+    public PageResult getBlogLinkPage(PageQueryUtil pageQueryUtil) {
+        List<TbLink> links=linkMapper.findLinkList(pageQueryUtil);
+        int total =linkMapper.getTotalLinks(pageQueryUtil);
+        PageResult pageResult =new PageResult(links,total,pageQueryUtil.getLimit(),pageQueryUtil.getPage());
+        return pageResult;
+    }
 }

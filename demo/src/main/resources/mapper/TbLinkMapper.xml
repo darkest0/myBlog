@@ -19,5 +19,19 @@
     <sql id="Base_Column_List">
         link_id, link_type, link_name, link_url, link_description, link_rank, is_deleted, create_time
     </sql>
+    <select id="findLinkList" resultType="blog.demo.entity.TbLink" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_link
+        where is_deleted=0
+        order by link_id desc
+        <if test="start!=null and limit!=null">
+            limit #{start},#{limit}
+        </if>
+    </select>
+    <select id="getTotalLinks" resultType="java.lang.Integer" parameterType="map">
+        select count(*) from tb_link
+        where is_deleted =0
+    </select>
 
 </mapper>
